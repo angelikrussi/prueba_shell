@@ -15,7 +15,7 @@ void prompt(void)
 
 	while (1)
 	{
-		write(STDOUT_FILENO, prompt, getStringLength(prompt));
+		write(STDOUT_FILENO, prompt, _strlen(prompt));
 
 		charactersRead = getline(&line, &lineSize, stdin);
 
