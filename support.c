@@ -1,61 +1,28 @@
 #include "shell.h"
 
 /**
- *_strdup - create an array.
- *@str: size of int;
- * Return: Always 0.
+ * _strcmp - Compares two strings
+ * @s1: First string
+ * @s2: Second string
+ * Return: Difference of first nonmatching character
  */
-char *_strdup(char *str)
+int _strcmp(char *s1, char *s2)
 {
-	int i;
-	int count;
-	char *s;
+	int i = 0;
 
-	count = 1;
-
-	if (str == NULL)
+	while (s1[i] != '\0' && s2[i] != '\0')
 	{
-		return (NULL);
+		if (s1[i] == s2[i])
+		{
+			i++;
+			continue;
+		}
+		else
+		{
+			return (s1[i] - s2[i]);
+		}
 	}
-
-	for (i = 0; str[i] != '\0'; i++)
-	{
-		count++;
-	}
-
-	s = malloc(count);
-
-	if (s == NULL)
-	{
-		return (NULL);
-	}
-
-	for (i = 0; i < count + 1; i++)
-	{
-		s[i] = str[i];
-	}
-	return (s);
-}
-
-/**
- * _split - Entry point.
- * @dest: Variable which will hold the string.
- * @src: Variable which holds the string.
- *
- * Return: 0.
- */
-
-int _split(char *string_console, char *delimiter)
-{
-	char *token;
-	​
-	token = strtok(string_console, delimiter);
-	​while (token != NULL)
-	{
-		printf("%s\n", token);
-		​token = strtok(NULL, DELIM);
-	}
-	​ return 0;
+	return (0);
 }
 
 /**
@@ -76,51 +43,64 @@ int _strlen(char *s)
 	return (sum);
 }
 
-
-
-/* ------------------------------ */
-
 /**
- * _getline - Gets line of user input
- * Return: Pointer to buffer of user input
+ * _getenv - gets env of input
+ * @env: input
+ * Return: env without =
  */
-char *_getline(void)
+char *_getenv(char *env)
 {
-	int temp;
-	char *line = NULL;
-	size_t size = 0;
+	int i = 0, n = 0;
+	char *temp, *res;
 
-	temp = getline(&line, &size, stdin);
-	if (temp == EOF)
+	while (environ[i] != NULL)
 	{
-		if (isatty(STDIN_FILENO))
-			write(1, "\n", 1);
-		exit(0);
+		if (_strcmp(environ[i], env) == 0)
+			temp = environ[i];
+		i++;
 	}
-	return (line);
-}
 
-char *get_line(void)
-{
-	char *buf = NULL;
-	size_t bufsize = 0;
-	int test;
-
-	test = getline(&buf, &bufsize, stdin);
-	if (test == EOF)
+	while (temp[n] != '\0')
 	{
-		write(1, "\n", 1);
-		_exit(1);
+		if (_strcmp(temp, env) == 0)
+			res = _strstr(temp, "/");
+		n++;
 	}
-	return (buf);
+	return (res);
 }
 
 /**
- * split_line - Splits line into args
+ * _strstr - locates sub string
+ * @haystack: input one
+ * @needle: input two
+ * Return: sub string
+ */
+char *_strstr(char *haystack, char *needle)
+{
+	for (; *haystack != '\0'; haystack++)
+	{
+		char *one = haystack;
+		char *two = needle;
+
+		while (*one == *two && *two != '\0')
+		{
+			one++;
+			two++;
+		}
+
+		if (*two == '\0')
+			return (haystack);
+	}
+
+	return (NULL);
+}
+
+/**
+ * tokenization - Splits line into args
  * @line: Line of user input
  * Return: Array of args of user input
  */
-char **split_line(char *line)
+char **tokenization(char *line)
 {
 	size_t buffer_size = TOKENS_BUFFER_SIZE;
 	char **tokens = malloc(sizeof(char *) * buffer_size);
@@ -141,85 +121,4 @@ char **split_line(char *line)
 	}
 	tokens[pos] = NULL;
 	return (tokens);
-}
-/**
- * check_for_builtins - Checks for builtins
- * @args: Arguments passed from prompt
- * @line: Buffer with line of input from user
- * @env: Environment
- * Return: 1 if builtins exist, 0 if they don't
- */
-int check_for_builtins(char **args, char *line, char **env)
-{
-	builtins_t list[] = {
-		{"exit", exit_shell},
-		{"env", env_shell},
-		{NULL, NULL}};
-	int i;
-
-	for (i = 0; list[i].arg != NULL; i++)
-	{
-		if (_strcmp(list[i].arg, args[0]) == 0)
-		{
-			list[i].builtin(args, line, env);
-			return (1);
-		}
-	}
-	return (0);
-}
-/**
- * launch_prog - Forks and launches unix cmd
- * @args: Args for cmd
- * Return: 1 on success
- */
-int launch_prog(char **args)
-{
-	pid_t pid, wpid;
-	int status;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		if (execve(args[0], args, NULL) == -1)
-		{
-			perror("Failed to execute command\n");
-			exit(0);
-		}
-	}
-	else if (pid < 0)
-	{
-		perror("Error forking\n");
-		exit(0);
-	}
-	else
-	{
-		do
-		{
-			wpid = waitpid(pid, &status, WUNTRACED);
-		} while (!WIFEXITED(status) && WIFSIGNALED(status));
-	}
-	(void)wpid;
-	return (1);
-}
-/**
- * builtins_checker - Checks for builtins
- * @args: Arguments passed from prompt
- * Return: 1 if builtins exist, 0 if they don't
- */
-
-/* args=[ls] */
-int builtins_checker(char **args)
-{
-	int i;
-	builtins_t list[] = {
-		{"exit", exit_shell},
-		{"env", env_shell},
-		{NULL, NULL}};
-
-	for (i = 0; list[i].arg != NULL; i++)
-	{
-		if (_strcmp(list[i].arg, args[0]) == 0)
-			return (1);
-	}
-	return (0);
 }

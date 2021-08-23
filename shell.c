@@ -32,20 +32,20 @@ int main(int argument_count, char **argument_vector, char **environment)
 		line_input = _getline();
 
 		/**
-		 * the function split_line is in helper.c file.
-		 * this function split a string and return a pointer to array
+		 * the function tokenization is in helper.c file.
+		 * this function tokenization a string and return a pointer to array
 		 */
-		argument_array = _split(line_input);
+		argument_array = tokenization(line_input);
 
 		/**
-		 * this function is in bridge.c file.
+		 * this function is in checker.c file.
 		 * this function search the argument in struct.
 		 * return 1 if user entered a path/builtin
 		 * 2 if user entered a binary
 		 */
 
 		/* ls -> args[0] = ls, args=[ls] */
-		route = bridge(argument_array[0], argument_array); /* 2 */
+		route = checker(argument_array[0], argument_array); /* 2 */
 
 		/**
 		 * pending
@@ -56,7 +56,7 @@ int main(int argument_count, char **argument_vector, char **environment)
 			argument_array[0] = find_path(argument_array[0], tmp_size, error);
 			if (argument_array[0] == error)
 			{
-				argument_array[0] = search_cwd(file_name, error);
+				argument_array[0] = get_cwd(file_name, error);
 				if (argument_array[0] == file_name)
 					write(1, error, 5);
 			}
@@ -66,7 +66,7 @@ int main(int argument_count, char **argument_vector, char **environment)
 		 *
 		 */
 		if (argument_array[0] != error)
-			status = execute_prog(argument_array, line_input, environment, route);
+			status = execute(argument_array, line_input, environment, route);
 
 		free(line_input);
 		free(argument_array);
