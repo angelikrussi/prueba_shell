@@ -20,7 +20,7 @@ int main(int argument_count, char **argument_vector, char **environment)
 	while (status)
 	{
 		/**
-		 * the function prompt is in extraneous.c file.
+		 * the function prompt is in prompt.c file.
 		 * this function print the character $ in console.
 		 */
 		prompt();
@@ -48,7 +48,10 @@ int main(int argument_count, char **argument_vector, char **environment)
 		route = checker(argument_array[0], argument_array); /* 2 */
 
 		/**
-		 * pending
+		 * if path is equal to two, enter
+		 * the condition to search for the
+		 * path in the env.
+		 *
 		 */
 		if (route == 2)
 		{

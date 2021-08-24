@@ -24,7 +24,7 @@ char *find_path(char *filename, char *tmp, char *er)
 		dir = opendir(file_path);
 		if (!dir)
 		{
-			printf("Error! Unable to open directory.\n");
+			printf("shell: command not found: %s\n", filename);
 			exit(0);
 		}
 		while ((sd = readdir(dir)))
@@ -139,7 +139,7 @@ char *get_cwd(char *filename, char *er)
 	dir = opendir(".");
 	if (!dir)
 	{
-		printf("Error! Unable to open directory.\n");
+		printf("shell: %s: command not found: \n", filename);
 		exit(0);
 	}
 	while ((sd = readdir(dir)))
